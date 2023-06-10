@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="529.0" prefWidth="320.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.Patient_loginController">
+   <children>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="white-form" stylesheets="@../design/pageDesign.css">
+         <children>
+            <Label layoutX="68.0" layoutY="110.0" text="Sign In your Account">
+               <font>
+                  <Font name="Tahoma" size="20.0" />
+               </font>
+            </Label>
+            <Label layoutX="88.0" layoutY="76.0" text="patient Login">
+               <font>
+                  <Font name="System Bold" size="23.0" />
+               </font>
+            </Label>
+            <TextField fx:id="patientUsernameTF" layoutX="36.0" layoutY="193.0" prefHeight="30.0" prefWidth="250.0" promptText="patient username" styleClass="textfield" stylesheets="@../design/pageDesign.css" />
+            <PasswordField fx:id="patientPasswordTF" layoutX="36.0" layoutY="233.0" prefHeight="30.0" prefWidth="250.0" promptText="patient Password" styleClass="textfield" stylesheets="@../design/pageDesign.css" />
+            <Button fx:id="patient_loginBtn" layoutX="35.0" layoutY="282.0" mnemonicParsing="false" onAction="#patientLogin" prefHeight="41.0" prefWidth="250.0" styleClass="btn" stylesheets="@../design/pageDesign.css" text="Login">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Button>
+            <Button fx:id="login_patientLogin" layoutX="43.0" layoutY="403.0" mnemonicParsing="false" onAction="#OpenAdminLoginPage" prefHeight="30.0" prefWidth="237.0" styleClass="btn" stylesheets="@../design/pageDesign.css" text="Admin Login" />
+            <Button fx:id="login_createAccount" layoutX="43.0" layoutY="443.0" mnemonicParsing="false" onAction="#OpenPatientRegisterPage" prefHeight="30.0" prefWidth="237.0" styleClass="btn" stylesheets="@../design/pageDesign.css" text="Create Patient Account" />
+         </children>
+      </AnchorPane>
+   </children>
+</StackPane>
