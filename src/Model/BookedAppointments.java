@@ -30,6 +30,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "BookedAppointments.findAll", query = "SELECT b FROM BookedAppointments b")
     , @NamedQuery(name = "BookedAppointments.findById", query = "SELECT b FROM BookedAppointments b WHERE b.id = :id")
+    , @NamedQuery(name = "BookedAppointments.findWaiting", query = "SELECT b FROM BookedAppointments b WHERE b.status = 'waiting' ")
+    , @NamedQuery(name = "BookedAppointments.findFinished", query = "SELECT b FROM BookedAppointments b WHERE b.status = 'finished' ")
     , @NamedQuery(name = "BookedAppointments.findByStatus", query = "SELECT b FROM BookedAppointments b WHERE b.status = :status")})
 public class BookedAppointments implements Serializable {
 
@@ -60,10 +62,9 @@ public class BookedAppointments implements Serializable {
         this.id = id;
     }
 
-    public BookedAppointments(Integer id, String status, String doctorCommnet) {
+    public BookedAppointments(Integer id, String status) {
         this.id = id;
         this.status = status;
-        this.doctorCommnet = doctorCommnet;
     }
 
     public Integer getId() {

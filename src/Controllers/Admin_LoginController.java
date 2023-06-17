@@ -47,6 +47,8 @@ import javax.persistence.TypedQuery;
  * @author WINDOWS 10
  */
 public class Admin_LoginController implements Initializable {
+    
+    public static Users userLogin;
 
 
     @FXML
@@ -91,14 +93,10 @@ public class Admin_LoginController implements Initializable {
         Users user = query.getSingleResult();
 
         if (user != null && user.getPassword().equals(password) && user.getRole().equals("admin")) {
-            String loggedInUsername = adminUsernameTF.getText();
-            Admin_dashboardController dashboardController = new Admin_dashboardController();
-            dashboardController.setLoggedInUsername(loggedInUsername);
-            
+            this.userLogin = user;
             ViewManager.closeAdminLoginPage();
             ViewManager.openAdminDashboardPage();
-            
-            
+
         } else {
             // Invalid credentials
             showErrorAlert("Invalid username or password!");

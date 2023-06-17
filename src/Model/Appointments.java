@@ -6,7 +6,6 @@
 package Model;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -33,6 +32,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Appointments.findAll", query = "SELECT a FROM Appointments a")
+    , @NamedQuery(name = "Appointments.findTotalBooked", query = "SELECT COUNT('id') FROM Appointments a WHERE a.status = 'booked' ")
+    , @NamedQuery(name = "Appointments.findTotalFree", query = "SELECT COUNT('id') FROM Appointments a WHERE a.status = 'free' ")
     , @NamedQuery(name = "Appointments.findById", query = "SELECT a FROM Appointments a WHERE a.id = :id")
     , @NamedQuery(name = "Appointments.findByAppointmentDate", query = "SELECT a FROM Appointments a WHERE a.appointmentDate = :appointmentDate")
     , @NamedQuery(name = "Appointments.findByAppointmentDay", query = "SELECT a FROM Appointments a WHERE a.appointmentDay = :appointmentDay")

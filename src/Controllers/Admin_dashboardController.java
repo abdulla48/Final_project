@@ -6,75 +6,57 @@
 package Controllers;
 
 import Model.Appointments;
+import Model.AppointmentsJpaController;
 import Model.BookedAppointments;
+import Model.BookedAppointmentsJpaController;
 import Model.Users;
+import Model.UsersJpaController;
 import View.ViewManager;
-import java.io.File;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.chart.AreaChart;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-
+import javax.persistence.TypedQuery;
 
 public class Admin_dashboardController implements Initializable {
-    String loggedInUsername;
 
-    public void setLoggedInUsername(String loggedInUsername) {
-        this.loggedInUsername = loggedInUsername;
-    }
+    private Users userLogin;
+
+    EntityManagerFactory emf = Persistence.createEntityManagerFactory("Final-ProjectPU");
+    UsersJpaController ujc = new UsersJpaController(emf);
+    AppointmentsJpaController ajc = new AppointmentsJpaController(emf);
+    BookedAppointmentsJpaController bjc = new BookedAppointmentsJpaController(emf);
+
+    @FXML
+    private Label home_totalPatients;
+    @FXML
+    private Label home_totalFAppointments;
+    @FXML
+    private Label home_totalBAppointments;
 
     @FXML
     private AnchorPane main_form;
-
-    @FXML
-    private Button close;
-
-    @FXML
-    private Button minimize;
 
     @FXML
     private Label username;
@@ -95,35 +77,14 @@ public class Admin_dashboardController implements Initializable {
     private AnchorPane home_form;
 
     @FXML
-    private Label home_totalEnrolled;
-
-    @FXML
-    private Label home_totalFemale;
-
-    @FXML
-    private Label home_totalMale;
-
-
-
-
-    @FXML
     private AnchorPane availableCourse_form;
-
-
-    
 
     @FXML
     private AnchorPane studentGrade_form;
 
-  
-    
-
     @FXML
     private TextField studentGrade_search;
 
-   
-
-    
     @FXML
     private TextField patients_search;
     @FXML
@@ -164,7 +125,7 @@ public class Admin_dashboardController implements Initializable {
     private Button patient_deleteBtn;
     @FXML
     private Button patient_clearBtn;
-    
+
     @FXML
     private TextField FAppointmentDate_TF;
     @FXML
@@ -190,15 +151,10 @@ public class Admin_dashboardController implements Initializable {
     @FXML
     private TableColumn<Appointments, String> FAppointmentStatus_col1;
     @FXML
-    private Button BAppointment_addBtn;
-    @FXML
-    private Button BAppointment_updateBtn;
-    @FXML
     private Button BAppointment_clearBtn;
     @FXML
     private Button BAppointment_deleteBtn;
-    
-    
+
     @FXML
     private Button addPatients_btn;
     @FXML
@@ -209,9 +165,7 @@ public class Admin_dashboardController implements Initializable {
     private AnchorPane addPatients;
     @FXML
     private Button patient_showBtn;
-    
-    EntityManagerFactory emf;
-    
+
     @FXML
     private Button FAppointment_showBtn1;
     @FXML
@@ -232,28 +186,44 @@ public class Admin_dashboardController implements Initializable {
     private TableColumn<BookedAppointments, String> BAppointmentDCom_col1;
     @FXML
     private Button BAppointment_showBtn1;
-    
 
-    
-   
-    
     //********************************************************************************************
-
-    
-    private void displayUsername(){
-        this.username.setText(loggedInUsername);
+    private void DisplayTotalPatients() {
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Long> query = em.createNamedQuery("Users.findTotalpatients", Long.class);
+        Long totalCount = query.getSingleResult();
+        home_totalPatients.setText(String.valueOf(totalCount));
+        em.close();
     }
-    
+
+    private void DisplayTotalFree() {
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Long> query1 = em.createNamedQuery("Appointments.findTotalFree", Long.class);
+        Long totalCount1 = query1.getSingleResult();
+        home_totalFAppointments.setText(String.valueOf(totalCount1));
+        em.close();
+
+    }
+
+    private void DisplayTotalBooked() {
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<Long> query2 = em.createNamedQuery("Appointments.findTotalBooked", Long.class);
+        Long totalCount2 = query2.getSingleResult();
+        home_totalBAppointments.setText(String.valueOf(totalCount2));
+        em.close();
+
+    }
+
     @FXML
     private void patientShow(ActionEvent event) {
-        emf = Persistence.createEntityManagerFactory("Final-ProjectPU");
+
         EntityManager em = emf.createEntityManager();
-        List <Users> Patients = em.createNamedQuery("Users.findPatients").getResultList();
+        List<Users> Patients = em.createNamedQuery("Users.findPatients").getResultList();
         patients_tableView.getItems().setAll(Patients);
         em.close();
-        
+
         Users selectedPatient = patients_tableView.getSelectionModel().getSelectedItem();
-        
+
         patient_id.setText(String.valueOf(selectedPatient.getId()));
         patient_gender.setValue(selectedPatient.getGender());
         patient_firstName.setText(selectedPatient.getFirstname());
@@ -262,12 +232,11 @@ public class Admin_dashboardController implements Initializable {
         patient_email.setText(selectedPatient.getEmail());
         patient_phone.setText(String.valueOf(selectedPatient.getPhone()));
     }
-    
+
     @FXML
     public void patientAdd() {
         Users user = new Users();
-        
-        
+
         user.setId(null);
         user.setGender(patient_gender.getValue());
         user.setFirstname(patient_firstName.getText());
@@ -276,31 +245,26 @@ public class Admin_dashboardController implements Initializable {
         user.setPhone(Integer.parseInt(patient_phone.getText()));
         user.setEmail(patient_email.getText());
         user.setRole("patient");
-        
-        emf = Persistence.createEntityManagerFactory("Final-ProjectPU");
+
         EntityManager em = this.emf.createEntityManager();
         em.getTransaction().begin();
         em.persist(user);
         em.getTransaction().commit();
         em.close();
-        
-        
-        
+
     }
 
     @FXML
     public void patientUpdate() {
         Users selectedPatient = patients_tableView.getSelectionModel().getSelectedItem();
-        
-        
-        
+
         if (selectedPatient != null) {
 
-            EntityManager em = this.emf.createEntityManager(); 
+            EntityManager em = this.emf.createEntityManager();
             em.getTransaction().begin();
 
             try {
-                
+
                 selectedPatient.setId(null);
                 selectedPatient.setGender(patient_gender.getValue());
                 selectedPatient.setFirstname(patient_firstName.getText());
@@ -310,32 +274,28 @@ public class Admin_dashboardController implements Initializable {
                 selectedPatient.setEmail(patient_email.getText());
                 selectedPatient.setRole("patient");
 
-                
-                em.merge(selectedPatient);
+                ujc.edit(selectedPatient);
 
-                em.getTransaction().commit();
-                
             } catch (Exception e) {
-                
+
                 e.printStackTrace();
                 em.getTransaction().rollback();
             } finally {
-                
+
                 em.close();
             }
         }
-        
-        
+
     }
 
     @FXML
     public void patientDelete() {
         Users selectedPatient = patients_tableView.getSelectionModel().getSelectedItem();
-    
-        if (selectedPatient != null) {
-            int patientId = selectedPatient.getId(); 
 
-            EntityManager em = this.emf.createEntityManager(); 
+        if (selectedPatient != null) {
+            int patientId = selectedPatient.getId();
+
+            EntityManager em = this.emf.createEntityManager();
 
             try {
                 em.getTransaction().begin();
@@ -354,13 +314,11 @@ public class Admin_dashboardController implements Initializable {
                 em.close();
             }
         }
-        
+
     }
 
-    
-    
-    private void resetControls(){
-        
+    private void resetControls() {
+
         patient_id.setText("");
         patient_firstName.setText("");
         patient_lastName.setText("");
@@ -369,13 +327,12 @@ public class Admin_dashboardController implements Initializable {
         patient_email.setText("");
         patients_tableView.getItems().clear();
     }
-    
+
     @FXML
     public void patientClear() {
         resetControls();
     }
 
-    
     @FXML
     public void patientSearch() {
 
@@ -383,7 +340,7 @@ public class Admin_dashboardController implements Initializable {
         ObservableList<Users> filteredData = FXCollections.observableArrayList();
 
         for (Users item : patients_tableView.getItems()) {
-           
+
             if (item.getFirstname().toLowerCase().contains(searchQuery)) {
                 filteredData.add(item);
             }
@@ -391,7 +348,7 @@ public class Admin_dashboardController implements Initializable {
         patients_tableView.setItems(filteredData);
     }
 
-    private final String[] genderList = {"male", "female"};
+    private final String[] genderList = {"male", "female", "Ahmed"};
 
     public void patientGenderList() {
 
@@ -405,20 +362,8 @@ public class Admin_dashboardController implements Initializable {
         patient_gender.setItems(ObList);
 
     }
-    
-
-
-
-    
 
 //*********************************************************************************************
-
-   
-
-    
-
-    
-
     @FXML
     public void logout() {
 
@@ -446,11 +391,10 @@ public class Admin_dashboardController implements Initializable {
 
     }
 
-    
-    public void defaultNav(){
+    public void defaultNav() {
         home_btn.setStyle("-fx-background-color:linear-gradient(to bottom right, #3f82ae, #26bf7d);");
     }
-    
+
     @FXML
     public void switchForm(ActionEvent event) {
         if (event.getSource() == home_btn) {
@@ -464,8 +408,6 @@ public class Admin_dashboardController implements Initializable {
             freeAppointments_btn.setStyle("-fx-background-color:transparent");
             bookedAppointments_btn.setStyle("-fx-background-color:transparent");
 
-            
-
         } else if (event.getSource() == addPatients_btn) {
             home_form.setVisible(false);
             addPatients.setVisible(true);
@@ -476,8 +418,6 @@ public class Admin_dashboardController implements Initializable {
             home_btn.setStyle("-fx-background-color:transparent");
             freeAppointments_btn.setStyle("-fx-background-color:transparent");
             bookedAppointments_btn.setStyle("-fx-background-color:transparent");
-
-
 
         } else if (event.getSource() == freeAppointments_btn) {
             home_form.setVisible(false);
@@ -490,8 +430,6 @@ public class Admin_dashboardController implements Initializable {
             home_btn.setStyle("-fx-background-color:transparent");
             bookedAppointments_btn.setStyle("-fx-background-color:transparent");
 
-
-
         } else if (event.getSource() == bookedAppointments_btn) {
             home_form.setVisible(false);
             addPatients.setVisible(false);
@@ -503,44 +441,35 @@ public class Admin_dashboardController implements Initializable {
             freeAppointments_btn.setStyle("-fx-background-color:transparent");
             home_btn.setStyle("-fx-background-color:transparent");
 
-
-
         }
     }
 
-    
-
-    
-
-     @FXML
+    //*********************************************************************************************
+    @FXML
     private void FAppointmentShow(ActionEvent event) {
-        emf = Persistence.createEntityManagerFactory("Final-ProjectPU");
+
         EntityManager em = emf.createEntityManager();
-        List <Appointments> free = em.createNamedQuery("Appointments.findFree").getResultList();
+        List<Appointments> free = em.createNamedQuery("Appointments.findFree").getResultList();
         FAppointment_tableView.getItems().setAll(free);
         em.close();
-        
+
         Appointments selectedAppointment = FAppointment_tableView.getSelectionModel().getSelectedItem();
-        
-        FAppointmentDate_col.setText(selectedAppointment.getAppointmentDate());
-        FAppointmentDay_col.setText(selectedAppointment.getAppointmentDay());
-        FAppointmentTime_col.setText(selectedAppointment.getAppointmentTime());
-        FAppointmentStatus_col1.setText(selectedAppointment.getStatus());
+        FAppointmentDate_TF.setText(selectedAppointment.getAppointmentDate());
+        FAppointmentDay_TF.setText(selectedAppointment.getAppointmentDay());
+        FAppointmentTime_TF.setText(selectedAppointment.getAppointmentTime());
+
     }
-    
+
     @FXML
     private void FAppointmentAdd(ActionEvent event) {
         Appointments appointment = new Appointments();
-        
-        
+
         appointment.setId(null);
         appointment.setAppointmentDate(FAppointmentDate_TF.getText());
         appointment.setAppointmentDay(FAppointmentDay_TF.getText());
         appointment.setAppointmentTime(FAppointmentTime_TF.getText());
         appointment.setStatus("free");
-        
-        
-        emf = Persistence.createEntityManagerFactory("Final-ProjectPU");
+
         EntityManager em = this.emf.createEntityManager();
         em.getTransaction().begin();
         em.persist(appointment);
@@ -551,12 +480,10 @@ public class Admin_dashboardController implements Initializable {
     @FXML
     private void FAppointmentUpdate(ActionEvent event) {
         Appointments selectedAppointment = FAppointment_tableView.getSelectionModel().getSelectedItem();
-        
-        
-        
+
         if (selectedAppointment != null) {
 
-            EntityManager em = this.emf.createEntityManager(); 
+            EntityManager em = this.emf.createEntityManager();
             em.getTransaction().begin();
 
             try {
@@ -565,22 +492,21 @@ public class Admin_dashboardController implements Initializable {
                 selectedAppointment.setAppointmentDay(FAppointmentDay_TF.getText());
                 selectedAppointment.setAppointmentTime(FAppointmentTime_TF.getText());
                 selectedAppointment.setStatus("free");
-                
-                
+
                 em.merge(selectedAppointment);
 
                 em.getTransaction().commit();
-                
+
             } catch (Exception e) {
-                
+
                 e.printStackTrace();
                 em.getTransaction().rollback();
             } finally {
-                
+
                 em.close();
             }
         }
-        
+
     }
 
     @FXML
@@ -597,11 +523,11 @@ public class Admin_dashboardController implements Initializable {
     @FXML
     private void FAppointmentDelete(ActionEvent event) {
         Appointments selectedAppointment = FAppointment_tableView.getSelectionModel().getSelectedItem();
-    
-        if (selectedAppointment != null) {
-            int appointmentId = selectedAppointment.getId(); 
 
-            EntityManager em = this.emf.createEntityManager(); 
+        if (selectedAppointment != null) {
+            int appointmentId = selectedAppointment.getId();
+
+            EntityManager em = this.emf.createEntityManager();
 
             try {
                 em.getTransaction().begin();
@@ -622,84 +548,19 @@ public class Admin_dashboardController implements Initializable {
         }
     }
 
-
     @FXML
     private void BAppointmentShow(ActionEvent event) {
-        emf = Persistence.createEntityManagerFactory("Final-ProjectPU");
+
         EntityManager em = emf.createEntityManager();
-        List <BookedAppointments> appoint = em.createNamedQuery("BookedAppointments.findAll").getResultList();
+        List<BookedAppointments> appoint = em.createNamedQuery("BookedAppointments.findAll").getResultList();
         BAppointment_tableView.getItems().setAll(appoint);
         em.close();
-        
+
         BookedAppointments selectedAppointment = BAppointment_tableView.getSelectionModel().getSelectedItem();
-        
+
         BAppointmentID_TF.setText(String.valueOf(selectedAppointment.getAppointmentId()));
         BAppointmentUserID_TF.setText(String.valueOf(selectedAppointment.getUserId()));
         BAppointmentDCom_TF1.setText(selectedAppointment.getDoctorCommnet());
-    }
-    
-    @FXML
-    private void BAppointmentAdd(ActionEvent event) {
-        emf = Persistence.createEntityManagerFactory("Final-ProjectPU");
-        EntityManager em = this.emf.createEntityManager();
-        
-        int appointmentId = Integer.parseInt(BAppointmentID_TF.getText());
-        int userId = Integer.parseInt(BAppointmentUserID_TF.getText());
-        
-        BookedAppointments bappointments = new BookedAppointments();
-        Appointments appointment = em.find(Appointments.class, appointmentId);
-        Users user = em.find(Users.class, userId);
-        
-        bappointments.setAppointmentId(appointment);
-        bappointments.setUserId(user);
-        bappointments.setId(null);
-        bappointments.setStatus("booked");
-        
-        
-        
-        em.getTransaction().begin();
-        em.persist(appointment);
-        em.getTransaction().commit();
-        em.close();
-    }
-
-    @FXML
-    private void BAppointmentUpdate(ActionEvent event) {
-        EntityManager em = this.emf.createEntityManager(); 
-        
-        BookedAppointments selectedAppointment = BAppointment_tableView.getSelectionModel().getSelectedItem();
-        
-        int appointmentId = Integer.parseInt(BAppointmentID_TF.getText());
-        int userId = Integer.parseInt(BAppointmentUserID_TF.getText());
-        
-        Appointments appointment = em.find(Appointments.class, appointmentId);
-        Users user = em.find(Users.class, userId);
-        
-        if (selectedAppointment != null) {
-
-            
-            em.getTransaction().begin();
-
-            try {
-                selectedAppointment.setId(null);
-                selectedAppointment.setAppointmentId(appointment);
-                selectedAppointment.setUserId(user);
-                selectedAppointment.setStatus("booked");
-                
-                
-                em.merge(selectedAppointment);
-
-                em.getTransaction().commit();
-                
-            } catch (Exception e) {
-                
-                e.printStackTrace();
-                em.getTransaction().rollback();
-            } finally {
-                
-                em.close();
-            }
-        }
     }
 
     @FXML
@@ -712,11 +573,11 @@ public class Admin_dashboardController implements Initializable {
     @FXML
     private void BAppointmentDelete(ActionEvent event) {
         BookedAppointments selectedAppointment = BAppointment_tableView.getSelectionModel().getSelectedItem();
-    
-        if (selectedAppointment != null) {
-            int appointmentId = selectedAppointment.getId(); 
 
-            EntityManager em = this.emf.createEntityManager(); 
+        if (selectedAppointment != null) {
+            int appointmentId = selectedAppointment.getId();
+
+            EntityManager em = this.emf.createEntityManager();
 
             try {
                 em.getTransaction().begin();
@@ -737,21 +598,15 @@ public class Admin_dashboardController implements Initializable {
         }
     }
 
- 
-    @FXML
-    public void close() {
-        System.exit(0);
-    }
-
-    @FXML
-    public void minimize() {
-        Stage stage = (Stage) main_form.getScene().getWindow();
-        stage.setIconified(true);
-    }
-
-    
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        this.userLogin = Controllers.Admin_LoginController.userLogin;
+        this.username.setText(userLogin.getFirstname());
+        DisplayTotalPatients();
+        DisplayTotalFree();
+        DisplayTotalBooked();
+
         // Scene 1 (Patient)
         patientID_col.setCellValueFactory(new PropertyValueFactory<>("id"));
         patientFirstName_col.setCellValueFactory(new PropertyValueFactory<>("firstname"));
@@ -774,11 +629,8 @@ public class Admin_dashboardController implements Initializable {
         BAppointmentDCom_col1.setCellValueFactory(new PropertyValueFactory<>("doctor_comment"));
 
         // Common initialization
-        displayUsername();
         defaultNav();
+
     }
-
-    
-
 
 }

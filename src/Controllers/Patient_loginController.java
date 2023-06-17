@@ -28,6 +28,7 @@ import javax.persistence.TypedQuery;
  */
 public class Patient_loginController implements Initializable {
 
+    public static Users userLogin;
 
     
     @FXML
@@ -64,10 +65,9 @@ public class Patient_loginController implements Initializable {
         Users user = query.getSingleResult();
 
         if (user != null && user.getPassword().equals(password) && user.getRole().equals("patient")) {
-            
+            this.userLogin = user;
             ViewManager.closePatientLoginPage();
             ViewManager.openPatientDashboardPage();
-            
         } else {
             // Invalid credentials
             showErrorAlert("Invalid username or password!");
